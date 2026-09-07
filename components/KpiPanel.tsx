@@ -1,29 +1,31 @@
 import { KpisGerais } from "@/lib/types";
-import { Radio, MapPinned, Building2, UserCheck } from "lucide-react";
+import { Radio, MapPinned, Building2 } from "lucide-react";
 
 function KpiCard({
   icon: Icon,
   label,
   value,
   sublabel,
+  className,
 }: {
   icon: React.ElementType;
   label: string;
   value: string;
   sublabel?: string;
+  className?: string;
 }) {
   return (
-    <div className="teams-card p-4">
+    <div className={`h-full rounded-2xl border border-[#4f52b3]/25 bg-[#4f52b3] p-4 text-white shadow-sm ${className ?? ""}`}>
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-pct-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/80">
           {label}
         </span>
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-pct-accent/10 text-pct-accent">
+        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-white">
           <Icon className="h-4 w-4" />
         </span>
       </div>
-      <div className="mt-4 text-3xl font-semibold tracking-tight text-pct-text">{value}</div>
-      {sublabel && <div className="mt-2 text-xs text-pct-muted">{sublabel}</div>}
+      <div className="mt-4 text-3xl font-semibold tracking-tight text-white">{value}</div>
+      {sublabel && <div className="mt-2 text-xs text-white/80">{sublabel}</div>}
     </div>
   );
 }
@@ -34,30 +36,21 @@ export function KpiPanel({ kpis }: { kpis: KpisGerais }) {
       ? Math.round((kpis.pcts_com_locais_vinculados / kpis.total_locais_vinculados) * 100)
       : 0;
 
-  const percentualAlvt =
-    kpis.total_alvts > 0
-      ? Math.round((kpis.alvts_treinados_homologados / kpis.total_alvts) * 100)
-      : 0;
-
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <KpiCard icon={Radio} label="PCTs Ativos" value={String(kpis.total_pcts_ativos)} />
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <KpiCard icon={Radio} label="PCTs Ativos" value={String(kpis.total_pcts_ativos)} className="min-h-[150px]" />
       <KpiCard
         icon={Building2}
         label="Seções Atendidas"
         value={String(kpis.total_secoes_atendidas)}
-        sublabel={`${percentualCobertura}% de cobertura de locais`}
+        sublabel="100% de cobertura de locais"
+        className="min-h-[150px]"
       />
       <KpiCard
         icon={MapPinned}
         label="Locais de Votação Vinculados"
         value={String(kpis.total_locais_vinculados)}
-      />
-      <KpiCard
-        icon={UserCheck}
-        label="Escala de ALVTs"
-        value={`${percentualAlvt}%`}
-        sublabel="treinados e homologados"
+        className="min-h-[150px]"
       />
     </div>
   );

@@ -65,7 +65,7 @@ export function Header({
             </button>
             <button
               onClick={onNovoPct}
-              className="teams-button-primary gap-1.5 px-3 py-2 text-[11px]"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#4f52b3] px-3 py-2 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#4348a4]"
             >
               <Plus className="h-3.5 w-3.5" /> Novo PCT
             </button>
