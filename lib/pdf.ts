@@ -2,8 +2,10 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { PCT, STATUS_LABELS, ZONA_ELEITORAL_NOME } from "./types";
 
+type RGB = [number, number, number];
+
 const HEADER_TITLE = "Justiça Eleitoral — Gestão de Polos de Contingência e Transmissão";
-const COLORS = {
+const COLORS: Record<string, RGB> = {
   indigo: [98, 100, 167],
   indigoSoft: [242, 244, 255],
   slate: [52, 65, 85],
@@ -51,8 +53,8 @@ function addFooter(doc: jsPDF) {
 
 function addStatusChip(doc: jsPDF, status: PCT["status"], x: number, y: number) {
   const label = STATUS_LABELS[status];
-  const colors = status === "pronto_transmissao" ? COLORS.indigo : COLORS.warning;
-  const soft = status === "pronto_transmissao" ? COLORS.indigoSoft : [255, 247, 237];
+  const colors: RGB = status === "pronto_transmissao" ? COLORS.indigo : COLORS.warning;
+  const soft: RGB = status === "pronto_transmissao" ? COLORS.indigoSoft : [255, 247, 237];
 
   doc.setFillColor(...soft);
   doc.roundedRect(x, y - 4, 58, 8.5, 2.2, 2.2, "F");
