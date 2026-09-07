@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PCT | Justiça Eleitoral",
+  title: "GPCT | Gestão de Polos de Contingência e Transmissão",
   description: "Gestão e Monitoramento de Polos de Contingência e Transmissão",
 };
 

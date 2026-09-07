@@ -344,7 +344,7 @@ export function NewPctDrawer({
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto bg-slate-50/70 px-6 py-5">
           <div className="rounded-2xl bg-white p-4 shadow-sm shadow-slate-200/40">
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4">
               <section className="space-y-3 rounded-xl bg-white p-3.5">
                 <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-pct-muted">
                   Identificação
@@ -425,7 +425,7 @@ export function NewPctDrawer({
                 </div>
               </section>
 
-              <div className="grid grid-cols-1 gap-4 xl:col-span-2 xl:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4">
                 <section className="space-y-3 rounded-xl bg-white p-3.5">
                   <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-pct-muted">
                     Responsável ALVT
@@ -587,7 +587,7 @@ export function NewPctDrawer({
                 </section>
               </div>
 
-              <section className="space-y-3 rounded-xl bg-white p-3.5 xl:col-span-2">
+              <section className="space-y-3 rounded-xl bg-white p-3.5">
                 <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-pct-muted">
                   Observações Técnicas
                 </h3>
