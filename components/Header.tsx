@@ -4,7 +4,7 @@ import { StatusProntidao, STATUS_LABELS, ZONA_ELEITORAL_NOME } from "@/lib/types
 import { FileDown, LogOut, Plus, Search, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function Header({
   busca,
@@ -26,6 +26,18 @@ export function Header({
   const router = useRouter();
   const supabase = createClient();
   const [saindo, setSaindo] = useState(false);
+  const [usuarioEmail, setUsuarioEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function carregarUsuario() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUsuarioEmail(user?.email ?? null);
+    }
+
+    carregarUsuario();
+  }, [supabase]);
 
   async function handleLogout() {
     if (saindo) return;
@@ -57,6 +69,11 @@ export function Header({
           </div>
 
           <div className="flex items-center gap-2">
+            {usuarioEmail && (
+              <span className="hidden text-[11px] text-pct-muted sm:inline-block">
+                {usuarioEmail}
+              </span>
+            )}
             <button
               onClick={onExportarRelatorio}
               className="teams-button-secondary gap-1.5 px-3 py-2 text-[11px]"

@@ -535,25 +535,6 @@ export function PctDetailsModal({
                   </div>
                   <div className="rounded-xl bg-slate-50 p-3 text-sm">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-pct-muted">
-                      Satélites
-                    </p>
-                    {modoEdicao ? (
-                      <select
-                        value={form.agrega_locais_satelites ? "sim" : "nao"}
-                        onChange={(e) => atualizarCampo("agrega_locais_satelites", e.target.value === "sim")}
-                        className="teams-input mt-2"
-                      >
-                        <option value="sim">Ativo</option>
-                        <option value="nao">Inativo</option>
-                      </select>
-                    ) : (
-                      <p className="mt-1 font-semibold text-pct-text">
-                        {form.agrega_locais_satelites ? "Ativo" : "Inativo"}
-                      </p>
-                    )}
-                  </div>
-                  <div className="rounded-xl bg-slate-50 p-3 text-sm">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-pct-muted">
                       Conectividade
                     </p>
                     {modoEdicao ? (

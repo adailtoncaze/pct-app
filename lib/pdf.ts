@@ -280,8 +280,8 @@ export function gerarRelatorioConsolidado(pcts: PCT[]) {
       const secoesVinculadas = p.secoes_vinculadas ?? 0;
       const secoesTotais = p.secoes_totais ?? p.secoes_proprias + secoesVinculadas;
       const locais = (p.locais_vinculados ?? [])
-        .map((local) => `${local.nome_escola} (${local.secoes_count})`)
-        .join("\n");
+        .map((local, index) => `${index > 0 ? "\n" : ""}${local.nome_escola} (${local.secoes_count})`)
+        .join("");
       return [
         p.codigo,
         p.nome,
@@ -298,6 +298,7 @@ export function gerarRelatorioConsolidado(pcts: PCT[]) {
       textColor: COLORS.text,
       overflow: "linebreak",
       valign: "middle",
+      lineHeight: 1.5,
     },
     headStyles: {
       fillColor: [245, 246, 248],
@@ -307,6 +308,7 @@ export function gerarRelatorioConsolidado(pcts: PCT[]) {
     },
     bodyStyles: {
       fillColor: [255, 255, 255],
+      lineHeight: 1.6,
     },
     alternateRowStyles: { fillColor: [250, 251, 253] },
     margin: { left: tableLeft, right: tableRight },
@@ -317,7 +319,7 @@ export function gerarRelatorioConsolidado(pcts: PCT[]) {
       2: { cellWidth: "auto" },
       3: { cellWidth: "auto" },
       4: { cellWidth: "auto" },
-      5: { cellWidth: "auto" },
+      5: { cellWidth: "auto", lineHeight: 1.8 },
     },
   });
 

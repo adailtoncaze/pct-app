@@ -45,7 +45,7 @@ export function PctCard({
         </div>
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-pct-muted">
-            Locais
+            Locais Vinculados
           </div>
           <div className="mt-1 font-semibold text-pct-text">
             {pct.locais_vinculados?.length ?? 0}
@@ -54,27 +54,21 @@ export function PctCard({
       </div>
 
       <div className="mt-4 text-xs text-pct-muted">
-        {pct.alvt ? <span>{pct.alvt.nome}</span> : <span>ALVT não atribuído</span>}
+        {pct.alvt ? <span>ALVT - {pct.alvt.nome}</span> : <span>ALVT não atribuído</span>}
       </div>
 
-      <div className="mt-4 flex gap-2 border-t border-pct-border pt-4">
+      <div className="mt-4 grid grid-cols-2 gap-2 border-t border-pct-border pt-4">
         <button
           onClick={() => gerarFichaPCT(pct)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-pct-accent/10 px-3 py-2 text-[11px] font-semibold text-pct-accent transition hover:bg-pct-accent/15"
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-pct-accent/10 px-3 py-2 text-[11px] font-semibold text-pct-accent transition hover:bg-pct-accent/15"
         >
           <FileDown className="h-3.5 w-3.5" /> PDF
         </button>
         <button
           onClick={() => onEdit?.(pct)}
-          className="teams-button-secondary flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-[11px]"
+          className="teams-button-secondary flex w-full items-center justify-center gap-1.5 px-3 py-2 text-[11px]"
         >
           <Pencil className="h-3.5 w-3.5" /> Editar
-        </button>
-        <button
-          onClick={() => onMapear?.(pct)}
-          className="teams-button-secondary flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-[11px]"
-        >
-          <Route className="h-3.5 w-3.5" /> Mapear
         </button>
       </div>
     </div>
