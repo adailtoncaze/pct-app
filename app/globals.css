@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --teams-bg: #f3f2f1;
+  --teams-panel: #ffffff;
+  --teams-panel-alt: #faf9f8;
+  --teams-border: #edebe9;
+  --teams-border-strong: #d2d0ce;
+  --teams-text: #201f1e;
+  --teams-text-soft: #605e5c;
+  --teams-primary: #6264a7;
+  --teams-primary-strong: #4f52b3;
+  --teams-primary-soft: rgba(98, 100, 167, 0.12);
+  --teams-success: #2e7d32;
+  --teams-warning: #ffb900;
+  --teams-danger: #d13438;
+  --teams-info: #0078d4;
+  --teams-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+html {
+  background-color: var(--teams-bg);
+  color: var(--teams-text);
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(98, 100, 167, 0.06), transparent 28%),
+    var(--teams-bg);
+  color: var(--teams-text);
+  font-family: "Segoe UI", "Segoe UI Variable", "Inter", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d1d1 transparent;
+}
+
+::selection {
+  background: rgba(98, 100, 167, 0.18);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  background-color: #fff;
+  color: var(--teams-text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8a8886;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d1d1;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b7b5b3;
+}
+
+@layer components {
+  .teams-card {
+    @apply rounded-2xl border border-pct-border bg-pct-panel shadow-teams;
+  }
+
+  .teams-modal {
+    @apply rounded-2xl border border-pct-border bg-pct-panel shadow-2xl;
+  }
+
+  .teams-input {
+    @apply w-full rounded-xl border border-pct-border bg-white px-3 py-2.5 text-sm text-pct-text transition duration-200 placeholder:text-slate-400 focus:border-pct-accent focus:outline-none focus:ring-2 focus:ring-pct-accent/15;
+  }
+
+  .teams-button-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-pct-accent px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-pct-accentStrong focus:outline-none focus:ring-2 focus:ring-pct-accent/20;
+  }
+
+  .teams-button-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-pct-border bg-white px-4 py-2.5 text-sm font-medium text-pct-text transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-pct-accent/10;
+  }
+}
