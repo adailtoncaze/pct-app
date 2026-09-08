@@ -31,9 +31,9 @@ export function Header({
   useEffect(() => {
     async function carregarUsuario() {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUsuarioEmail(user?.email ?? null);
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUsuarioEmail(session?.user?.email ?? null);
     }
 
     carregarUsuario();

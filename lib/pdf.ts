@@ -179,11 +179,13 @@ export function gerarFichaPCT(pct: PCT) {
     addHeader(doc, `Ficha do Polo — ${pct.codigo}`);
   }
 
-  if (pct.locais_vinculados && pct.locais_vinculados.length > 0) {
+  const locaisVinculados = pct.locais_vinculados ?? [];
+
+  if (locaisVinculados.length > 0) {
     autoTable(doc, {
       startY: y,
       head: [["Escola / Local", "Seções"]],
-      body: pct.locais_vinculados.map((l) => [l.nome_escola, String(l.secoes_count)]),
+      body: locaisVinculados.map((l) => [l.nome_escola, String(l.secoes_count)]),
       theme: "grid",
       styles: {
         fontSize: 8.5,
@@ -199,8 +201,10 @@ export function gerarFichaPCT(pct: PCT) {
       alternateRowStyles: { fillColor: [248, 250, 252] },
       margin: { left: 14, right: 14 },
     });
+
     // @ts-expect-error lastAutoTable é injetado pelo plugin em runtime
-    y = doc.lastAutoTable.finalY + 8;
+    const finalY = doc.lastAutoTable?.finalY ?? y + 20;
+    y = finalY + 8;
   }
 
   doc.setDrawColor(...COLORS.border);
@@ -298,7 +302,6 @@ export function gerarRelatorioConsolidado(pcts: PCT[]) {
       textColor: COLORS.text,
       overflow: "linebreak",
       valign: "middle",
-      lineHeight: 1.5,
     },
     headStyles: {
       fillColor: [245, 246, 248],
@@ -308,7 +311,6 @@ export function gerarRelatorioConsolidado(pcts: PCT[]) {
     },
     bodyStyles: {
       fillColor: [255, 255, 255],
-      lineHeight: 1.6,
     },
     alternateRowStyles: { fillColor: [250, 251, 253] },
     margin: { left: tableLeft, right: tableRight },
@@ -319,7 +321,7 @@ export function gerarRelatorioConsolidado(pcts: PCT[]) {
       2: { cellWidth: "auto" },
       3: { cellWidth: "auto" },
       4: { cellWidth: "auto" },
-      5: { cellWidth: "auto", lineHeight: 1.8 },
+      5: { cellWidth: "auto" },
     },
   });
 

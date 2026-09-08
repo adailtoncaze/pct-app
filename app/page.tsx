@@ -30,12 +30,28 @@ export default function DashboardPage() {
       supabase
         .from("vw_pcts_totais")
         .select(
-          `*,
-          alvt:alvts(*),
-          locais_vinculados(*)`
+          `id,
+          codigo,
+          nome,
+          logradouro,
+          cep,
+          ponto_referencia,
+          status,
+          alvt_id,
+          secoes_proprias,
+          secoes_totais,
+          secoes_vinculadas,
+          transmite_secoes_proprias,
+          agrega_locais_satelites,
+          conectividade,
+          possui_nobreak,
+          ponto_rede_homologado,
+          observacoes_tecnicas,
+          alvt:alvts(id, nome, telefone, matricula_eleitoral, cpf, treinado, homologado, crachao_titularidade),
+          locais_vinculados(id, nome_escola, secoes_count, pct_id)`
         )
         .order("codigo"),
-      supabase.from("vw_kpis_gerais").select("*").single(),
+      supabase.from("vw_kpis_gerais").select("total_pcts_ativos, total_secoes_atendidas, pcts_com_locais_vinculados, total_locais_vinculados, total_alvts, alvts_treinados_homologados").single(),
     ]);
 
     const pctsAtualizados = (pctsData as unknown as PCT[]) ?? [];
@@ -115,10 +131,9 @@ export default function DashboardPage() {
       <PctDetailsModal
         pct={modalDetalhes}
         open={Boolean(modalDetalhes)}
-        onClose={async () => {
+        onClose={() => {
           setModalDetalhes(null);
           setSearchDisabled(false);
-          await carregarDados();
         }}
         onUpdated={carregarDados}
         onDeleteStateChange={(ativo) => {

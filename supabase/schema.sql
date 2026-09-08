@@ -70,6 +70,8 @@ alter table public.pcts
   add column if not exists deleted_by uuid references auth.users(id);
 
 create index if not exists idx_pcts_deleted_at on public.pcts(deleted_at);
+create index if not exists idx_pcts_deleted_status on public.pcts(deleted_at, status);
+create index if not exists idx_pcts_codigo on public.pcts(codigo);
 create index if not exists idx_pcts_alvt on public.pcts(alvt_id);
 
 -- ---------- Locais satélites vinculados a um PCT ----------

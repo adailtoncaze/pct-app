@@ -69,8 +69,11 @@ export function NewPctDrawer({
     if (!open) return;
 
     const carregarAlvts = async () => {
-      const { data: a } = await supabase.from("alvts").select("*").order("nome");
-      setAlvts(a ?? []);
+      const { data: a } = await supabase
+        .from("alvts")
+        .select("id, nome, matricula_eleitoral, telefone, treinado, homologado, crachao_titularidade, cpf")
+        .order("nome");
+      setAlvts((a as ALVT[]) ?? []);
     };
 
     carregarAlvts();
@@ -191,17 +194,45 @@ export function NewPctDrawer({
       let alvtIdFinal = alvtId || null;
 
       if (mode === "edit" && pctToEdit?.alvt_id) {
-        const { error: erroAlvt } = await supabase
-          .from("alvts")
-          .update({
-            nome: novoAlvtNome.trim(),
-            telefone: novoAlvtTelefone.trim(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", pctToEdit.alvt_id);
+        const { data: outrosPcts, error: erroBuscaPcts } = await supabase
+          .from("pcts")
+          .select("id")
+          .eq("alvt_id", pctToEdit.alvt_id)
+          .neq("id", pctToEdit.id)
+          .limit(1);
 
-        if (erroAlvt) throw erroAlvt;
-        alvtIdFinal = pctToEdit.alvt_id;
+        if (erroBuscaPcts) throw erroBuscaPcts;
+
+        if (outrosPcts && outrosPcts.length > 0) {
+          const { data: novoAlvt, error: erroAlvt } = await supabase
+            .from("alvts")
+            .insert({
+              nome: novoAlvtNome.trim(),
+              cpf: "",
+              telefone: novoAlvtTelefone.trim(),
+              matricula_eleitoral: "",
+              treinado: false,
+              homologado: false,
+              crachao_titularidade: "titular",
+            })
+            .select()
+            .single();
+
+          if (erroAlvt) throw erroAlvt;
+          alvtIdFinal = novoAlvt.id;
+        } else {
+          const { error: erroAlvt } = await supabase
+            .from("alvts")
+            .update({
+              nome: novoAlvtNome.trim(),
+              telefone: novoAlvtTelefone.trim(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", pctToEdit.alvt_id);
+
+          if (erroAlvt) throw erroAlvt;
+          alvtIdFinal = pctToEdit.alvt_id;
+        }
       } else if (criarNovoAlvt) {
         const { data: novoAlvt, error: erroAlvt } = await supabase
           .from("alvts")
@@ -212,6 +243,7 @@ export function NewPctDrawer({
             matricula_eleitoral: "",
             treinado: false,
             homologado: false,
+            crachao_titularidade: "titular",
           })
           .select()
           .single();

@@ -40,6 +40,7 @@ export function PctDetailsModal({
   const [locais, setLocais] = useState<LocalVinculado[]>(pct?.locais_vinculados ?? []);
   const [alvts, setAlvts] = useState<ALVT[]>([]);
   const [salvando, setSalvando] = useState(false);
+  const [carregandoDetalhes, setCarregandoDetalhes] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error" | "warning"; message: string } | null>(null);
   const [editDrawerAberto, setEditDrawerAberto] = useState(false);
@@ -56,17 +57,77 @@ export function PctDetailsModal({
   }, [toast]);
 
   useEffect(() => {
-    if (pct) {
-      setForm(pct);
-      setLocais(pct.locais_vinculados ?? []);
-      setModoEdicao(false);
-      setErro(null);
-    }
-  }, [pct]);
+    if (!pct) return;
+
+    setForm(pct);
+    setLocais(pct.locais_vinculados ?? []);
+    setModoEdicao(false);
+    setErro(null);
+    setCarregandoDetalhes(true);
+
+    let ignore = false;
+
+    const carregarDetalhesCompletos = async () => {
+      const { data, error } = await supabase
+        .from("vw_pcts_totais")
+        .select(
+          `id,
+          codigo,
+          nome,
+          logradouro,
+          cep,
+          ponto_referencia,
+          status,
+          alvt_id,
+          secoes_proprias,
+          secoes_totais,
+          secoes_vinculadas,
+          transmite_secoes_proprias,
+          agrega_locais_satelites,
+          conectividade,
+          possui_nobreak,
+          ponto_rede_homologado,
+          observacoes_tecnicas,
+          created_at,
+          updated_at,
+          alvt:alvts(id, nome, telefone, matricula_eleitoral, cpf, treinado, homologado, crachao_titularidade),
+          locais_vinculados(id, nome_escola, secoes_count, pct_id)`
+        )
+        .eq("id", pct.id)
+        .single();
+
+      if (ignore) return;
+
+      if (error || !data) {
+        setCarregandoDetalhes(false);
+        return;
+      }
+
+      const pctDetalhado = {
+        ...data,
+        created_at: data.created_at ?? pct.created_at ?? new Date().toISOString(),
+        updated_at: data.updated_at ?? pct.updated_at ?? new Date().toISOString(),
+      } as unknown as PCT;
+
+      setForm(pctDetalhado);
+      setLocais(pctDetalhado.locais_vinculados ?? []);
+      setCarregandoDetalhes(false);
+    };
+
+    carregarDetalhesCompletos();
+
+    return () => {
+      ignore = true;
+      setCarregandoDetalhes(false);
+    };
+  }, [pct, supabase]);
 
   useEffect(() => {
     const carregarAlvts = async () => {
-      const { data } = await supabase.from("alvts").select("*").order("nome");
+      const { data } = await supabase
+        .from("alvts")
+        .select("id, nome, matricula_eleitoral, telefone, treinado, homologado, crachao_titularidade, cpf")
+        .order("nome");
       setAlvts((data as ALVT[]) ?? []);
     };
 
@@ -75,8 +136,16 @@ export function PctDetailsModal({
 
   const secoesTotais = useMemo(() => {
     if (!form) return 0;
-    return (form.secoes_totais ?? form.secoes_proprias ?? 0) + (form.locais_vinculados?.length ?? 0);
-  }, [form]);
+
+    const secoesLocaisVinculados = (locais ?? []).reduce(
+      (total, local) => total + Number(local.secoes_count ?? 0),
+      0
+    );
+
+    return (form.secoes_totais ?? 0) > 0
+      ? form.secoes_totais ?? 0
+      : Number(form.secoes_proprias ?? 0) + secoesLocaisVinculados;
+  }, [form, locais]);
 
   if (!open || !form) return null;
 
@@ -139,6 +208,50 @@ export function PctDetailsModal({
         return;
       }
 
+      let alvtIdFinal = form.alvt_id ?? null;
+
+      if (form.alvt_id && form.alvt) {
+        const { data: outrosPcts, error: erroBuscaPcts } = await supabase
+          .from("pcts")
+          .select("id")
+          .eq("alvt_id", form.alvt_id)
+          .neq("id", form.id)
+          .limit(1);
+
+        if (erroBuscaPcts) throw erroBuscaPcts;
+
+        if (outrosPcts && outrosPcts.length > 0) {
+          const { data: novoAlvt, error: erroAlvt } = await supabase
+            .from("alvts")
+            .insert({
+              nome: form.alvt.nome,
+              matricula_eleitoral: form.alvt.matricula_eleitoral ?? "",
+              cpf: form.alvt.cpf ?? "",
+              telefone: form.alvt.telefone,
+              treinado: Boolean(form.alvt.treinado),
+              homologado: Boolean(form.alvt.homologado),
+              crachao_titularidade: form.alvt.crachao_titularidade ?? "titular",
+            })
+            .select()
+            .single();
+
+          if (erroAlvt) throw erroAlvt;
+          alvtIdFinal = novoAlvt.id;
+        } else {
+          const { error: erroAlvt } = await supabase
+            .from("alvts")
+            .update({
+              nome: form.alvt.nome,
+              telefone: form.alvt.telefone,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", form.alvt_id);
+
+          if (erroAlvt) throw erroAlvt;
+          alvtIdFinal = form.alvt_id;
+        }
+      }
+
       const payload = {
         codigo: form.codigo,
         nome: form.nome,
@@ -146,7 +259,7 @@ export function PctDetailsModal({
         cep: form.cep ?? null,
         ponto_referencia: form.ponto_referencia ?? null,
         status: form.status,
-        alvt_id: form.alvt_id ?? null,
+        alvt_id: alvtIdFinal,
         secoes_proprias: Number(form.secoes_proprias ?? 0),
         transmite_secoes_proprias: Boolean(form.transmite_secoes_proprias),
         agrega_locais_satelites: Boolean(form.agrega_locais_satelites),
@@ -159,19 +272,6 @@ export function PctDetailsModal({
 
       const { error: erroPct } = await supabase.from("pcts").update(payload).eq("id", form.id);
       if (erroPct) throw erroPct;
-
-      if (form.alvt_id && form.alvt) {
-        const { error: erroAlvt } = await supabase
-          .from("alvts")
-          .update({
-            nome: form.alvt.nome,
-            telefone: form.alvt.telefone,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", form.alvt_id);
-
-        if (erroAlvt) throw erroAlvt;
-      }
 
       const locaisValidos = locais.filter((local) => local.nome_escola.trim() !== "");
 
@@ -829,10 +929,12 @@ export function PctDetailsModal({
             <>
               <button
                 type="button"
-                className="teams-button-primary"
-                onClick={() => setEditDrawerAberto(true)}
+                className="teams-button-primary disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={() => !carregandoDetalhes && setEditDrawerAberto(true)}
+                disabled={carregandoDetalhes}
               >
-                <Pencil className="mr-1.5 h-4 w-4" /> Editar
+                <Pencil className="mr-1.5 h-4 w-4" />
+                {carregandoDetalhes ? "Carregando..." : "Editar"}
               </button>
               <button
                 type="button"
@@ -863,7 +965,7 @@ export function PctDetailsModal({
           setEditDrawerAberto(false);
         }}
         mode="edit"
-        pctToEdit={pct}
+        pctToEdit={form ?? pct}
       />
     </div>
   );
