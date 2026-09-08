@@ -507,7 +507,7 @@ export function NewPctDrawer({
                           <option value="">Selecione um ALVT já convocado...</option>
                           {alvts.map((a) => (
                             <option key={a.id} value={a.id}>
-                              {a.nome} — mat. {a.matricula_eleitoral}
+                              {a.nome}
                             </option>
                           ))}
                         </select>
