@@ -233,6 +233,24 @@ export function NewPctDrawer({
           if (erroAlvt) throw erroAlvt;
           alvtIdFinal = pctToEdit.alvt_id;
         }
+      } else if (mode === "edit" && !pctToEdit?.alvt_id) {
+        // Editando um PCT que não tinha ALVT - criar novo
+        const { data: novoAlvt, error: erroAlvt } = await supabase
+          .from("alvts")
+          .insert({
+            nome: novoAlvtNome.trim(),
+            cpf: "",
+            telefone: novoAlvtTelefone.trim(),
+            matricula_eleitoral: "",
+            treinado: false,
+            homologado: false,
+            crachao_titularidade: "titular",
+          })
+          .select()
+          .single();
+
+        if (erroAlvt) throw erroAlvt;
+        alvtIdFinal = novoAlvt.id;
       } else if (criarNovoAlvt) {
         const { data: novoAlvt, error: erroAlvt } = await supabase
           .from("alvts")
@@ -463,8 +481,34 @@ export function NewPctDrawer({
                     Responsável ALVT
                   </h3>
 
-                  {mode === "edit" ? (
+                  {mode === "edit" && pctToEdit?.alvt_id ? (
                     <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3">
+                      <label className="mb-1 block text-xs font-medium text-pct-muted">
+                        Nome do responsável ALVT <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        required
+                        value={novoAlvtNome}
+                        onChange={(e) => setNovoAlvtNome(e.target.value)}
+                        placeholder="Nome completo"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-pct-accent focus:ring-1 focus:ring-pct-accent"
+                      />
+                      <label className="mb-1 block text-xs font-medium text-pct-muted">
+                        Telefone do responsável ALVT <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        required
+                        value={novoAlvtTelefone}
+                        onChange={(e) => setNovoAlvtTelefone(e.target.value)}
+                        placeholder="Telefone de contato"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-pct-accent focus:ring-1 focus:ring-pct-accent"
+                      />
+                    </div>
+                  ) : mode === "edit" && !pctToEdit?.alvt_id ? (
+                    <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3">
+                      <p className="text-xs text-pct-muted mb-3">
+                        Este PCT ainda não tem um responsável ALVT. Preencha os dados abaixo para criar um novo.
+                      </p>
                       <label className="mb-1 block text-xs font-medium text-pct-muted">
                         Nome do responsável ALVT <span className="text-red-500">*</span>
                       </label>
